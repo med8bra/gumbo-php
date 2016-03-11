@@ -1,5 +1,4 @@
 # GumboPHP
-=====
 
 GumboPHP is low-level extension for Gumbo HTML5 Parser (https://github.com/google/gumbo-parser).
 
@@ -8,7 +7,6 @@ Main idea is use Gumbo Parser for building DOM Document (http://php.net/manual/e
 __NOT ready for production.__
 
 # Installation
-=====
 
 ```bash
 git clone https://github.com/layershifter/GumboPHP.git
