@@ -20,7 +20,7 @@ static zend_function_entry gumbo_class_methods[] =
 };
 
 void build_dom(GumboNode* node) {
-	php_printf(node->v.text.text);
+	//php_printf(node->v.text.text);
 
 	//if (node->type != GUMBO_NODE_ELEMENT) {
 	//	return;
@@ -51,9 +51,34 @@ PHP_METHOD(gumbo_class, load) {
 	convert_to_string(zv_html);
 
 	GumboOutput* output = gumbo_parse(Z_STRVAL_P(zv_html));
+
+	// Create DOMDocument
+
+	zval dom_document, dom_constructor, dom_ret, dom_params[2];
+
+	object_init_ex(&dom_document, dom_document_class_entry);
+
+	//ZVAL_STRING(&dom_constructor, ZEND_CONSTRUCTOR_FUNC_NAME);
+
+	//ZVAL_NULL(&dom_params[0]);
+	//ZVAL_NULL(&dom_params[1]);
+
+	//if (call_user_function(NULL, &dom_document, &dom_constructor, &dom_ret, 2, dom_params) == FAILURE) {
+	//	php_error_docref(NULL, E_ERROR, "Error calling constructor");
+	//}
+
+	//zval_dtor(&dom_constructor);
+	//zval_dtor(&dom_ret);
+	//zval_dtor(&dom_params);
+	
 	build_dom(output->root);
 
 	gumbo_destroy_output(&kGumboDefaultOptions, output);
+	//zval_ptr_dtor(&tmp_soap);
+
+	// Return DOMDocument
+
+	RETURN_ZVAL(&dom_document, 0, 0);
 }
 
 PHP_MINIT_FUNCTION(gumbo)

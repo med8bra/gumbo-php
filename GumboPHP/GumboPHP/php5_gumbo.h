@@ -6,11 +6,16 @@
 #define ZEND_DEBUG false
 #define ZEND_WIN32 true
 #define PHP_WIN32 true
-
 #define PHP_COMPILER_ID "VC14"
 
 #include "zend_config.w32.h"
 #include "php.h"
+
+#define HAVE_LIBXML true
+#define HAVE_DOM true
+
+#include "ext/libxml/php_libxml.h"
+#include "ext/dom/php_dom.h"
 
 extern zend_module_entry gumbo_module_entry;
 #define phpext_gmagick_ptr &gumbo_module_entry

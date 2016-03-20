@@ -88,16 +88,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GUMBOPHP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\dev\gumbo-parser-master\src;C:\dev\php-7.0.4-src\TSRM;C:\dev\php-7.0.4-src\Zend;C:\dev\php-7.0.4-src\main;C:\dev\php-7.0.4-src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\User\Desktop\iconv-1.9.2.win32\include;C:\dev\gumbo-parser-master\src;C:\dev\php-7.0.4-src\TSRM;C:\dev\php-7.0.4-src\Zend;C:\dev\php-7.0.4-src\main;C:\dev\php-7.0.4-src;C:\Users\User\Desktop\libxml2-2.7.8.win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>C:\dev\php-7.0.4\ext\gumbo.dll</OutputFile>
-      <AdditionalLibraryDirectories>C:\dev\php-7.0.4\dev;C:\Users\User\Desktop\gumbo-parser-master\visualc\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\User\Desktop\iconv-1.9.2.win32\lib;C:\dev\php-7.0.4\dev;C:\Users\User\Desktop\libxml2-2.7.8.win32\lib;C:\Users\User\Desktop\gumbo-parser-master\visualc\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>php7.lib;gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iconv.lib;php7.lib;gumbo.lib;libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
