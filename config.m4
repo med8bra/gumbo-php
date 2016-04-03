@@ -1,6 +1,8 @@
 PHP_ARG_WITH(gumbo, for gumbo support,
 [  --with-gumbo[[=DIR]]      Include gumbo support])
 
+CFLAGS="$CFLAGS -std=c99"
+
 dnl
 
 if test "$PHP_GUMBO" != "no"; then

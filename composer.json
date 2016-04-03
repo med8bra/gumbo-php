@@ -1,0 +1,18 @@
+{
+  "name": "Layershifter/Gumbo",
+  "description": "Package with tests for Gumbo extension",
+  "minimum-stability": "stable",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Alexander Fedyashov",
+      "email": "a@fedyashov.com"
+    }
+  ],
+  "autoload-dev": {
+    "psr-4": {"Layershifter\\Gumbo\\Tests\\": "tests/Gumbo"}
+  },
+  "require-dev": {
+    "phpunit/phpunit" : "5.*"
+  }
+}

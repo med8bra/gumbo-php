@@ -1,103 +1,254 @@
+/*
+ * Copyright 2016 Alexander Fedyashov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "php5_gumbo.h"
-#include "gumbo.h"
+
+//
+// Main parser function. Parses HTML with Gumbo and runs recursive parsing for elements.
+//
+xmlDocPtr gumboParseString(zval* zvHtml) {
+    // Run Gumbo Parser.
+
+    GumboOptions gumboOptions = kGumboDefaultOptions;
+    GumboOutput* gumboOutput = gumbo_parse_with_options(&gumboOptions, Z_STRVAL_P(zvHtml), Z_STRLEN_P(zvHtml));
+
+    // Create new xmlDoc.
+
+    xmlDocPtr xmlDoc = xmlNewDoc(BAD_CAST "1.0");
+
+    // If HTML page has DTD (Document Type Definition) then add it to xmlDoc.
+
+    GumboDocument* gumboDocument = &gumboOutput->document->v.document;
+
+    if(gumboDocument->has_doctype) {
+        xmlNewDtd(
+            xmlDoc,
+            BAD_CAST gumboDocument->name,
+            BAD_CAST gumboDocument->public_identifier,
+            BAD_CAST gumboDocument->system_identifier
+        );
+    }
+
+    // Main parsing process.
+
+    gumboRecursiveParse(xmlDoc, (xmlNodePtr)xmlDoc, gumboOutput->root);
+
+    // Clearing gumbo and returning xmlDoc.
+
+    // TODO: Errors to libXML
+
+    gumbo_destroy_output(&gumboOptions, gumboOutput);
+
+    return xmlDoc;
+}
+
+//
+// Recursive parser function.
+//
+void gumboRecursiveParse(xmlDocPtr xmlDoc, xmlNodePtr parentNode, GumboNode* gumboNode) {
+
+    if(gumboNode->parse_flags & GUMBO_INSERTION_BY_PARSER) {
+        gumboSkipElement(xmlDoc, parentNode, gumboNode);
+
+        return;
+    }
+
+    switch(gumboNode->type) {
+        case GUMBO_NODE_DOCUMENT:
+            // @TODO: Throw exception
+        break;
+
+        case GUMBO_NODE_ELEMENT:
+        case GUMBO_NODE_TEMPLATE:
+            gumboParseElement(xmlDoc, parentNode, gumboNode);
+        break;
+
+        case GUMBO_NODE_TEXT:
+        case GUMBO_NODE_WHITESPACE:
+        case GUMBO_NODE_CDATA:
+            xmlAddChild(parentNode, xmlNewText(BAD_CAST gumboNode->v.text.text));
+        break;
+
+        case GUMBO_NODE_COMMENT:
+            xmlAddChild(parentNode, xmlNewComment(BAD_CAST gumboNode->v.text.text));
+        break;
+    }
+}
+
+//
+// Function for skipping elements that Gumbo generated automatically.
+//
+void gumboSkipElement(xmlDocPtr xmlDoc, xmlNodePtr parentNode, GumboNode* gumboNode) {
+    GumboVector gumboChildren = gumboNode->v.element.children;
+
+    // Skip processing if node doesn't have children.
+
+    if(gumboChildren.length == 0) {
+        return;
+    }
+
+    // If node has only one child, loop isn't need.
+
+    if(gumboChildren.length == 1) {
+        GumboNode* gumboChildNode = gumboChildren.data[0];
+        gumboRecursiveParse(xmlDoc, parentNode, gumboChildNode);
+    }
+
+    // Run loop for children elements.
+
+    for (int i = 0; i < gumboChildren.length; i++) {
+        GumboNode* gumboChildNode = gumboChildren.data[i];
+        gumboRecursiveParse(xmlDoc, parentNode, gumboChildNode);
+    }
+}
+
+//
+// Function for processing elements.
+//
+void gumboParseElement(xmlDocPtr xmlDoc, xmlNodePtr parentNode, GumboNode* gumboNode) {
+    GumboElement* gumboElement = &gumboNode->v.element;
+    int i;
+
+    // Creating XML node.
+
+    xmlNodePtr resultNode = xmlNewNode(NULL, gumboGetTagName(gumboElement));
+
+    // Processing namespaces.
+
+    if (gumboNode->parent->type != GUMBO_NODE_DOCUMENT
+        && gumboElement->tag_namespace != gumboNode->parent->v.element.tag_namespace
+    ) {
+        xmlNsPtr namespace = xmlNewNs(
+            resultNode,
+            BAD_CAST gumboXmlns[gumboElement->tag_namespace], NULL
+        );
+        xmlSetNs(resultNode, namespace);
+    }
+
+    // Processing attributes.
+
+    GumboVector gumboAttributes = gumboElement->attributes;
+
+    if(gumboAttributes.length > 0) {
+        for (i = 0; i < gumboAttributes.length; ++i) {
+            GumboAttribute* gumboAttribute = gumboAttributes.data[i];
+
+            xmlNewProp(
+                resultNode,
+                BAD_CAST gumboAttribute->name,
+                BAD_CAST gumboAttribute->value
+            );
+        }
+    }
+
+    // Processing children.
+
+    GumboVector gumboChildren = gumboElement->children;
+
+    if(gumboChildren.length > 0) {
+        for (i = 0; i < gumboChildren.length; ++i) {
+            gumboRecursiveParse(xmlDoc, resultNode, gumboChildren.data[i]);
+        }
+    }
+
+    xmlAddChild(parentNode, resultNode);
+}
+
+//
+// Function that returns pointer to real tag name.
+//
+xmlChar* gumboGetTagName(GumboElement* gumboElement) {
+    if(gumboElement->tag == GUMBO_TAG_UNKNOWN) {
+        GumboStringPiece original_tag = gumboElement->original_tag;
+        gumbo_tag_from_original_text(&original_tag);
+
+        return BAD_CAST original_tag.data;
+    }
+
+    return BAD_CAST gumbo_normalized_tagname(gumboElement->tag);
+}
+
+//
+// Zend declarations.
+//
 
 zend_class_entry *gumbo_class_entry;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_gumbo_load, 0, 0, 1)
-	ZEND_ARG_INFO(0, html)
+    ZEND_ARG_INFO(0, html)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry gumbo_functions[] = {
-	{ NULL, NULL, NULL }
+    PHP_FE_END
 };
 
 static zend_function_entry gumbo_class_methods[] =
 {
-	PHP_ME(gumbo_class,	load, arginfo_gumbo_load, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-{
-	NULL, NULL, NULL
-}
+    PHP_ME(gumbo_class, load, arginfo_gumbo_load, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    PHP_FE_END
 };
 
-void build_dom(GumboNode* node) {
-	//php_printf(node->v.text.text);
-
-	//if (node->type != GUMBO_NODE_ELEMENT) {
-	//	return;
-	//}
-
-	//GumboAttribute* href;
-	//if (node->v.element.tag == GUMBO_TAG_A &&
-	//	(href = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
-	//	std::cout << href->value << std::endl;
-	//}
-
-	//GumboVector* children = &node->v.element.children;
-	//for (unsigned int i = 0; i < children->length; ++i) {
-	//	search_for_links(static_cast<GumboNode*>(children->data[i]));
-	//}
-}
-
-
+//
+// Method for parsing HTML into DOMDocument.
+// \DomDocument Layershifter\Gumbo::load(string $html);
+//
 PHP_METHOD(gumbo_class, load) {
-	zval *zv_html;
+    zval *zvHtml;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zv_html) == FAILURE) {
-		// @TODO: Throw exception
+    // Parsing input values
 
-			RETURN_BOOL(false);
-	}
+    if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &zvHtml) == FAILURE) {
+        // @TODO: Throw exception
 
-	convert_to_string(zv_html);
+        RETURN_BOOL(false);
+    }
 
-	GumboOutput* output = gumbo_parse(Z_STRVAL_P(zv_html));
+    convert_to_string(zvHtml);
 
-	// Create root DOMNode
+    // Parsing document and return DOMDocument
 
-	zval dom_node;
-	object_init_ex(&dom_node, dom_node_class_entry);
+    int ret;
+    dom_object *intern;
+    xmlDocPtr xmlDoc = gumboParseString(zvHtml);
 
-	//zend_update_property(test_ce, obj, "foo", sizeof("foo") - 1, new_foo_value TSRMLS_CC);
-
-	//ZVAL_STRING(&dom_constructor, ZEND_CONSTRUCTOR_FUNC_NAME);
-
-	//ZVAL_NULL(&dom_params[0]);
-	//ZVAL_NULL(&dom_params[1]);
-
-	//if (call_user_function(NULL, &dom_document, &dom_constructor, &dom_ret, 2, dom_params) == FAILURE) {
-	//	php_error_docref(NULL, E_ERROR, "Error calling constructor");
-	//}
-
-	//zval_dtor(&dom_constructor);
-	//zval_dtor(&dom_ret);
-	//zval_dtor(&dom_params);
-	
-	build_dom(output->root);
-
-	gumbo_destroy_output(&kGumboDefaultOptions, output);
-	//zval_ptr_dtor(&tmp_soap);
-
-	// Return DOMDocument
-
-	RETURN_ZVAL(&dom_node, 0, 0);
+    DOM_RET_OBJ((xmlNodePtr)xmlDoc, &ret, intern);
 }
 
+//
+// Register extension.
+//
 PHP_MINIT_FUNCTION(gumbo)
 {
-	zend_class_entry ce;
+    zend_class_entry ce;
 
-	INIT_CLASS_ENTRY(ce, "Layershifter\\Gumbo", gumbo_class_methods);
-	zend_register_internal_class(&ce);
+    INIT_CLASS_ENTRY(ce, "Layershifter\\Gumbo", gumbo_class_methods);
+    zend_register_internal_class(&ce);
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
+//
+// Module declarations.
+//
 zend_module_entry gumbo_module_entry =
 {
 	STANDARD_MODULE_HEADER,		/* Standard module header */
 	PHP_GUMBO_EXTNAME,			/* Extension name */
 	gumbo_functions,			/* Functions */
-	PHP_MINIT(gumbo),			/* MINIT */
+	PHP_MINIT(gumbo),           /* MINIT */
 	NULL,						/* MSHUTDOWN */
 	NULL,						/* RINIT */
 	NULL,						/* RSHUTDOWN */

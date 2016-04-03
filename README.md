@@ -23,3 +23,7 @@ This will build a 'gumbo.so' shared extension, load it in php.ini using:
 [gumbo]
 extension = gumbo.so
 ```
+
+#License
+
+Copyright (c) 2016 Alexander Fedyashov. Licensed under the Apache License.
