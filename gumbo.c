@@ -105,6 +105,8 @@ void gumboSkipElement(xmlDocPtr xmlDoc, xmlNodePtr parentNode, GumboNode* gumboN
     if(gumboChildren.length == 1) {
         GumboNode* gumboChildNode = gumboChildren.data[0];
         gumboRecursiveParse(xmlDoc, parentNode, gumboChildNode);
+
+        return;
     }
 
     // Run loop for children elements.
@@ -172,10 +174,16 @@ void gumboParseElement(xmlDocPtr xmlDoc, xmlNodePtr parentNode, GumboNode* gumbo
 //
 xmlChar* gumboGetTagName(GumboElement* gumboElement) {
     if(gumboElement->tag == GUMBO_TAG_UNKNOWN) {
-        GumboStringPiece original_tag = gumboElement->original_tag;
-        gumbo_tag_from_original_text(&original_tag);
+        GumboStringPiece originalTag = gumboElement->original_tag;
+        gumbo_tag_from_original_text(&originalTag);
 
-        return BAD_CAST original_tag.data;
+        char * tagName = NULL;
+        tagName = malloc(sizeof(char) * originalTag.length);
+
+        memcpy(tagName, originalTag.data, originalTag.length);
+        tagName[originalTag.length]= '\0';
+
+        return BAD_CAST tagName;
     }
 
     return BAD_CAST gumbo_normalized_tagname(gumboElement->tag);
