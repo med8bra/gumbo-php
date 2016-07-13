@@ -1,15 +1,23 @@
-PHP_ARG_WITH(gumbo, for gumbo support,
-[  --with-gumbo[[=DIR]]      Include gumbo support])
+dnl #
+dnl # Flags for compilation
+dnl #
 
 CFLAGS="$CFLAGS -std=c99"
 
-dnl
+dnl #
+dnl # Extension config
+dnl #
+
+PHP_ARG_WITH(gumbo, for gumbo support,
+[  --with-gumbo[[=DIR]]      Include gumbo support])
 
 if test "$PHP_GUMBO" != "no"; then
+  dnl #
+  dnl # Testing for gumbo support
+  dnl #
+
   SEARCH_PATH="/usr/local /usr"
   SEARCH_FOR="/include/gumbo.h"
-
-  dnl
 
   if test -r $PHP_GUMBO/$SEARCH_FOR; then
     GUMBO_DIR=$PHP_GUMBO
@@ -24,45 +32,29 @@ if test "$PHP_GUMBO" != "no"; then
   fi
 
   PHP_ADD_INCLUDE($GUMBO_DIR/include)
-
-  dnl
-
-  LIBNAME=gumbo
-  LIBSYMBOL=gumbo_destroy_output
-
-  PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,
+  PHP_CHECK_LIBRARY(gumbo, gumbo_destroy_output,
   [
-    PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $GUMBO_DIR/lib, GUMBO_SHARED_LIBADD)
-    AC_DEFINE(HAVE_GUMBOLIB,1,[ ])
+    PHP_ADD_LIBRARY_WITH_PATH(gumbo, $GUMBO_DIR/lib, GUMBO_SHARED_LIBADD)
   ],[
-    AC_MSG_ERROR([wrong gumbo lib version or lib not found])
-  ],[
+    AC_MSG_ERROR([wrong version of gumbo of it's not found])
+  ], [
     -L$GUMBO_DIR/lib -lm
   ])
 
-  dnl
+  dnl #
+  dnl # Checks for php-libxml support
+  dnl #
 
-  PHP_SUBST(GUMBO_SHARED_LIBADD)
+  if test "$PHP_LIBXML" = "no"; then
+    AC_MSG_ERROR([Gumbo extension requires LIBXML extension])
+  else
+    PHP_SETUP_LIBXML(GUMBO_SHARED_LIBADD, [
+      PHP_NEW_EXTENSION(gumbo, src/gumbo.c src/parser.c, $ext_shared)
+      PHP_ADD_BUILD_DIR([$ext_builddir/src/])
+      PHP_ADD_EXTENSION_DEP(dom, libxml)
+      PHP_SUBST(GUMBO_SHARED_LIBADD)
+    ], [
+      AC_MSG_ERROR([xml2-config not found. Please check your libxml2 installation.])
+    ])
+  fi
 fi
-
-dnl # Checks for libxml2
-
-if test -z "$PHP_LIBXML_DIR"; then
-  PHP_ARG_WITH(libxml-dir, libxml2 install dir,
-  [  --with-libxml-dir=DIR   Libxml2 install prefix], no, no)
-fi
-
-if test "$PHP_LIBXML" = "no"; then
-  AC_MSG_ERROR([Gumbo extension requires LIBXML extension])
-fi
-
-PHP_SETUP_LIBXML(GUMBO_SHARED_LIBADD, [
-  AC_DEFINE(HAVE_GUMBO,1,[ ])
-  PHP_NEW_EXTENSION(gumbo, gumbo.c, $ext_shared)
-  PHP_SUBST(GUMBO_SHARED_LIBADD)
-], [
-  AC_MSG_ERROR([xml2-config not found. Please check your libxml2 installation.])
-])
-
-PHP_ADD_EXTENSION_DEP(gumbo, libxml)
-PHP_ADD_EXTENSION_DEP(gumbo, dom)

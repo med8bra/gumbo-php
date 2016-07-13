@@ -1,20 +1,31 @@
-# GumboPHP
+# Gumbo PHP
 
-GumboPHP is low-level extension for Gumbo HTML5 Parser (https://github.com/google/gumbo-parser).
+`gumbo-php` is low-level extension for HTML5 parsing.
 
-Main idea is use Gumbo Parser for building DOM Document (http://php.net/manual/en/class.domdocument.php) instead of PHP's `DOMDocument::load()`. PHP's built-in loader has many problems with loading HTML5 pages and pages with inline JavaScript.
+[![Software License][ico-license]](LICENSE.md)
+[![Build Status][ico-travis]][link-travis]
+[![PHP 7 ready][ico-php7ready]][link-travis]
 
-__NOT ready for production.__
+`gumbo-php` is that builds [DOMDocument](http://php.net/manual/en/class.domdocument.php) using [Gumbo HTML5 Parser](https://github.com/google/gumbo-parser). This solution solves all problems with HTML5 parsing or pages with inline JavaScript.
 
-# Installation
+## Requirements
+
+The following versions of PHP are supported.
+
+* PHP 5.6
+* PHP 7.0
+
+## Install
+
+To build `gumbo-php` extenstion PHP-devel package is required. The package should contain phpize utility.
 
 ```bash
-git clone https://github.com/layershifter/GumboPHP.git
-cd gumbo
-phpize
-./configure
-make
-make install
+$ git clone https://github.com/layershifter/gumbo-php.git
+$ cd gumbo-php
+$ phpize
+$ ./configure
+$ make
+$ make install
 ```
 
 This will build a 'gumbo.so' shared extension, load it in php.ini using:
@@ -24,6 +35,17 @@ This will build a 'gumbo.so' shared extension, load it in php.ini using:
 extension = gumbo.so
 ```
 
-#License
+## Testing
+``` bash
+$ composer test
+```
 
-Copyright (c) 2016 Alexander Fedyashov. Licensed under the Apache License.
+## License
+
+This library is released under the Apache 2.0 license. Please see [License File](LICENSE.md) for more information.
+
+[ico-license]: https://img.shields.io/badge/license-Apache2-brightgreen.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/layershifter/TLDExtract/master.svg?style=flat-square
+[ico-php7ready]: http://php7ready.timesplinter.ch/layershifter/TLDExtract/master/badge.svg
+
+[link-travis]: https://travis-ci.org/layershifter/gumbo-php

@@ -1,26 +1,18 @@
-#IDE
-.idea/
+# C
 
-#PHP
-vendor/
-composer.lock
-composer.phar
-
-#Build
-.libs/
+.libs
 autom4te.cache/
 build/
 include/
 modules/
 
-*.la
-*.lo
-*.log
 *.m4
-
+*.lo
+*.la
 .deps
 config.*
-configure*
+configure
+configure.in
 install-sh
 libtool
 ltmain.sh
@@ -30,3 +22,9 @@ mkinstalldirs
 run-tests.php
 
 !config.m4
+
+# PHP
+
+vendor/
+composer.lock
+composer.phar
