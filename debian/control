@@ -1,0 +1,21 @@
+Source: php-gumbo
+Priority: optional
+Maintainer: Alexander V. Fedyashov <a@fedyashov.com>
+Build-Depends: debhelper (>= 8),
+               libgumbo-dev, libxml2-dev,
+               php5-dev | php-all-dev,
+               pkg-config
+Section: php
+Standards-Version: 3.9.4
+Homepage: https://github.com/layershifter/gumbo-php
+VCS-Browser: https://github.com/layershifter/gumbo-php
+VCS-Git: git://github.com:layershifter/gumbo-php.git
+
+Package: php5-gumbo
+Architecture: any
+Priority: optional
+Depends: ${php:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Description: Low-level PHP extension for HTML5
+ gumbo-php is that builds DOMDocument using Gumbo HTML5 Parser.
+ This solution solves all problems with HTML5 parsing or pages with inline JavaScript.
+

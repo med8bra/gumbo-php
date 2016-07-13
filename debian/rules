@@ -1,0 +1,37 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+phpapi	= $(shell php-config5 --phpapi)
+version = $(shell dpkg-parsechangelog \
+	|grep ^Version|awk '{print $$2}'|sed 's/-.*//')
+
+makebuilddir/php5-gumbo::
+	phpize
+	./configure
+	make
+	echo "php:Depends=phpapi-$(phpapi)" > debian/php5-gumbo.substvars
+
+install/php5-gumbo::
+	install -m 0755 -d debian/php5-gumbo/usr/lib/php5/$(phpapi)/
+	install -m 0755 -d debian/php5-gumbo/etc/php5/mods-available/
+	install -m 0755 modules/gumbo.so \
+		debian/php5-gumbo/usr/lib/php5/$(phpapi)/
+	echo extension=gumbo.so \
+		> debian/php5-gumbo/etc/php5/mods-available/gumbo.ini
+
+clean::
+	phpize --clean
+	rm -f debian/debhelper.log
+	rm -f debian/*.substvars
+	rm -f src/gumbo.lo
+	rm -fr src/.libs
+
+tarball: clean
+	cd .. \
+	&& tar \
+		--exclude=debian \
+		--exclude=.git \
+		-czvf php-gumbo_$(version).orig.tar.gz \
+		php-gumbo-$(version)
+
