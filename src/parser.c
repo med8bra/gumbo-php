@@ -239,13 +239,13 @@ xmlChar* gumbo_get_text(GumboNode* node) {
 // \DomDocument Layershifter\Gumbo::load(string $html);
 //
 PHP_METHOD(GumboParser, load) {
-    zval *html;
-
     // Parsing input values
 
     #if PHP_MAJOR_VERSION < 7
-        int result = zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_DC, "z", &html);
+        zval **html;
+        int result = zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Z", &html);
     #else
+        zval *html;
         int result = zend_parse_parameters(ZEND_NUM_ARGS(), "z", &html);
     #endif
 
@@ -265,7 +265,7 @@ PHP_METHOD(GumboParser, load) {
     #if PHP_MAJOR_VERSION < 7
         int ret;
 
-        php_dom_create_object((xmlNodePtr)doc, &ret, return_value, intern TSRMLS_DC);
+        php_dom_create_object((xmlNodePtr)doc, &ret, return_value, intern TSRMLS_CC);
     #else
         php_dom_create_object((xmlNodePtr)doc, return_value, intern);
     #endif
