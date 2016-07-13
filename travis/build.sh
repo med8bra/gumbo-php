@@ -60,6 +60,11 @@ if [ -n "${TRAVIS_REPO_SLUG}" ]; then
     fi
     BRANCH="${TRAVIS_BRANCH}"
     if [[ ! ${ENABLED_BRANCHES} =~ "${BRANCH}" ]] ; then
+        if [ -f test.sh ]; then
+            echo "Build skipped - the branch ${BRANCH} is not for packaging, found test.sh script"
+            exec bash test.sh
+        fi
+
         echo "Build skipped - the branch ${BRANCH} is not for packaging"
         exit 0
     fi
