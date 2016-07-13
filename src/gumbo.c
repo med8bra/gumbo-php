@@ -29,8 +29,12 @@ PHP_MINIT_FUNCTION(gumbo)
     
     zend_class_entry parser_ce;
     INIT_CLASS_ENTRY(parser_ce, "Layershifter\\Gumbo\\Parser", gumbo_parser_methods);
-    
-    gumbo_parser_class_entry = zend_register_internal_class(&parser_ce);
+
+    #if PHP_MAJOR_VERSION < 7
+        gumbo_parser_class_entry = zend_register_internal_class(&parser_ce TSRMLS_CC);
+    #else
+        gumbo_parser_class_entry = zend_register_internal_class(&parser_ce);
+    #endif
             
     return SUCCESS;
 }

@@ -258,5 +258,11 @@ PHP_METHOD(GumboParser, load) {
     dom_object *intern;
     xmlDocPtr doc = gumbo_parse_string(html);
 
-    php_dom_create_object((xmlNodePtr)doc, return_value, intern);
+    #if PHP_MAJOR_VERSION < 7
+        int ret;
+
+        php_dom_create_object((xmlNodePtr)doc, &ret, return_value, intern);
+    #else
+        php_dom_create_object((xmlNodePtr)doc, return_value, intern);
+    #endif
 }
