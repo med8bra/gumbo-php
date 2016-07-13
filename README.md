@@ -37,6 +37,7 @@ extension = gumbo.so
 
 ## Testing
 ``` bash
+$ composer install
 $ composer test
 ```
 
