@@ -24,13 +24,13 @@ matrix:
       php: 7
 
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer update --no-interaction --prefer-dist
+  - if [[ $PACK == 'none' ]]; then travis_retry composer self-update; fi
+  - if [[ $PACK == 'none' ]]; then travis_retry composer update --no-interaction --prefer-dist; fi
 
 script:
   - git clone https://github.com/tarantool/build.git
   - bash travis/build.sh
-  - if [[ $PACK == 'none' && $TRAVIS_PHP_VERSION != '7.0' ]]; then vendor/bin/phpunit; fi
+  - if [[ $PACK == 'none' ]]; then vendor/bin/phpunit; fi
 
 notifications:
   email: false
