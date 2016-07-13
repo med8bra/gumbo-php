@@ -6,7 +6,7 @@
 [![Build Status][ico-travis]][link-travis]
 [![PHP 7 ready][ico-php7ready]][link-travis]
 
-`gumbo-php` is that builds [DOMDocument](http://php.net/manual/en/class.domdocument.php) using [Gumbo HTML5 Parser](https://github.com/google/gumbo-parser). This solution solves all problems with HTML5 parsing or pages with inline JavaScript.
+`gumbo-php` builds [DOMDocument](http://php.net/manual/en/class.domdocument.php) using [Gumbo HTML5 Parser](https://github.com/google/gumbo-parser). This solution solves all problems with HTML5 parsing or pages with inline JavaScript.
 
 ## Requirements
 
