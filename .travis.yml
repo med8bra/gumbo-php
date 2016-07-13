@@ -30,7 +30,7 @@ before_script:
 script:
   - git clone https://github.com/tarantool/build.git
   - bash travis/build.sh
-  - vendor/bin/phpunit
+  - if [[ $PACK == 'none' && $TRAVIS_PHP_VERSION != '7.0' ]]; then vendor/bin/phpunit; fi
 
 notifications:
   email: false
