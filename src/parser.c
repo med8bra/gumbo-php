@@ -217,8 +217,6 @@ xmlChar* gumbo_get_tag_name(GumboElement* element) {
     return BAD_CAST tag_name;
 }
 
-const char *END_DELIM = '<';
-
 //
 // Function that returns pointer to real text.
 //
@@ -245,7 +243,13 @@ PHP_METHOD(GumboParser, load) {
 
     // Parsing input values
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &html) == FAILURE) {
+    #if PHP_MAJOR_VERSION < 7
+        int result = zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_DC, "z", &html);
+    #else
+        int result = zend_parse_parameters(ZEND_NUM_ARGS(), "z", &html);
+    #endif
+
+    if (result == FAILURE) {
         // @TODO: Throw exception
 
         RETURN_BOOL(false);
@@ -261,7 +265,7 @@ PHP_METHOD(GumboParser, load) {
     #if PHP_MAJOR_VERSION < 7
         int ret;
 
-        php_dom_create_object((xmlNodePtr)doc, &ret, return_value, intern);
+        php_dom_create_object((xmlNodePtr)doc, &ret, return_value, intern TSRMLS_DC);
     #else
         php_dom_create_object((xmlNodePtr)doc, return_value, intern);
     #endif
