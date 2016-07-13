@@ -1,11 +1,10 @@
 #!/bin/bash
 
 SCRIPT=$(readlink -f $0)
-SCRIPT_DIR=$(readlink -f $(dirname ${SCRIPT})/../)
+SCRIPT_DIR=$(readlink -f $(dirname ${SCRIPT})/../build)
 
 ENABLED_BRANCHES="production"
-DOCKER_REPO="layershifter/gumbo-php"
-#DOCKER_REPO="rtsisyk/build"
+DOCKER_REPO="layershifter/gumbo"
 
 usage() {
     echo "$1"
