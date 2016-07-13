@@ -12,6 +12,7 @@ sudo: required
 
 env:
   global:
+    - PACKAGECLOUD_REPO=layershifter/php-gumbo
     - PRODUCT=php-gumbo
   matrix:
     - OS=debian DIST=jessie PACK=deb

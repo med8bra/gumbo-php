@@ -159,6 +159,7 @@ fi
 
 if [ -n "${PACKAGECLOUD_TOKEN}" ]; then
     echo "Exporting packages to packagecloud.io repo ${PACKAGECLOUD_REPO}"
+
     if [ "${OS}" == "centos" ]; then
         # Packagecloud doesn't support CentOS, but supports RHEL
         echo "PackageCloud doesn't support ${OSDIST}"
@@ -169,7 +170,9 @@ if [ -n "${PACKAGECLOUD_TOKEN}" ]; then
         echo "Skipping..."
         exit 0
     fi
+
     gem install package_cloud
+
     if [ "${PACK}" == "rpm" ]; then
         package_cloud push ${PACKAGECLOUD_REPO}/${OS}/${DIST}/ \
             ${RESULTS}/*[!src].rpm --skip-errors
