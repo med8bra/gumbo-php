@@ -14,14 +14,13 @@ env:
   global:
     - PRODUCT=php-gumbo
   matrix:
-#    - OS=debian DIST=jessie PACK=deb
+    - OS=debian DIST=jessie PACK=deb
     - PACK=none
 
-#matrix:
-#  fast_finish: true
-#  exclude:
-#    - env: OS=debian DIST=jessie PACK=deb
-#      php: 7
+matrix:
+  exclude:
+    - env: OS=debian DIST=jessie PACK=deb
+      php: 7
 
 before_script:
   - travis_retry composer self-update
@@ -29,7 +28,7 @@ before_script:
 
 script:
   - git clone https://github.com/tarantool/build.git
-  - bash build/pack/travis.sh
+  - bash travis/build.sh
   - vendor/bin/phpunit
 
 notifications:
