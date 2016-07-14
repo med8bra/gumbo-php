@@ -1,12 +1,22 @@
 # Gumbo PHP
 
-`gumbo-php` is low-level extension for HTML5 parsing.
+**Gumbo PHP** is low-level extension for HTML5 parsing.
 
 [![Software License][ico-license]](LICENSE.md)
 [![Build Status][ico-travis]][link-travis]
 [![PHP 7 ready][ico-php7ready]][link-travis]
 
-`gumbo-php` builds [DOMDocument](http://php.net/manual/en/class.domdocument.php) using [Gumbo HTML5 Parser](https://github.com/google/gumbo-parser). This solution solves all problems with HTML5 parsing or pages with inline JavaScript.
+**Gumbo PHP** builds [DOMDocument](http://php.net/manual/en/class.domdocument.php) using [Gumbo HTML5 Parser](https://github.com/google/gumbo-parser). This solution solves all problems with HTML5 parsing or pages with inline JavaScript.
+
+```php
+use Layershifter\Gumbo\Parser;
+
+$document = Parser::load('<a>Apples and bananas.</a>');
+var_dump($document->saveHTML());
+
+string(33) "<a>Apples and bananas.</a>
+"
+```
 
 ## Requirements
 
