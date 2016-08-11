@@ -15,6 +15,7 @@
  */
 
 #include "parser.h"
+#include <regex.h>
 
 zend_class_entry *gumbo_parser_class_entry;
 
@@ -226,24 +227,53 @@ xmlChar* gumbo_get_text(GumboNode* node) {
        return BAD_CAST node->v.text.text;
     }
 
-    char* real_text;
-    int length;
-
     GumboStringPiece* text = &node->v.text.original_text;
-    GumboElement* parent_element = &node->parent->v.element;
-
-    if(parent_element->tag == GUMBO_TAG_BODY) {
-      char *ret = strstr(text->data, "</body");
-      length = ret == NULL ? text->length : ret - text->data;
-    } else {
-      length = text->length;
-    }
+    int length = gumbo_get_text_length(node, text);
+    char* real_text;
 
     real_text = malloc(sizeof(char) * length + 1);
     strncpy(real_text, text->data, length);
     real_text[length] = '\0';
 
     return BAD_CAST real_text;
+}
+
+int gumbo_get_text_length(GumboNode* node, GumboStringPiece* text) {
+   GumboElement* parent_element = &node->parent->v.element;
+
+   if(parent_element->tag != GUMBO_TAG_BODY) {
+     return (int) text->length;
+   }
+
+   int reg_ret;
+   regmatch_t reg_matches[1];
+   regex_t reg_ex;
+
+   reg_ret = regcomp(&reg_ex, "<([[:alpha:]]|/)", REG_EXTENDED);
+
+   if (reg_ret) {
+     // TODO: Throw fatal error
+     exit(1);
+   }
+
+   reg_ret = regexec(&reg_ex, text->data, 1, reg_matches, 0);
+
+   if (reg_ret == 0) {
+ //printf("match (%d): %s \n", reg_matches[0].rm_so, text->data);
+
+     return (int) reg_matches[0].rm_so;
+   }
+
+   if (reg_ret == REG_NOMATCH) {
+   //printf("%s \n", text->data);
+     regfree(&reg_ex);
+
+     return (int) text->length;
+   }
+
+   regfree(&reg_ex);
+   exit(1);
+   // TODO: Throw fatal error
 }
 
 //

@@ -155,6 +155,16 @@ HTML;
                 'a'
             ],
             [
+                '<html><body>< aaa ></body></html>',
+                '< aaa >',
+                false
+            ],
+            [
+                '<html><body>a <& <* <4</body></html>',
+                'a <& <* <4',
+                false
+            ],
+            [
                 '<html><body>a > test</body></html>',
                 'a > test',
                 false
@@ -164,7 +174,80 @@ HTML;
                 'a < test',
                 false
             ],
+            [
+                '<html><body>a < тест</body></html>',
+                'a < тест',
+                false
+            ],
+            [
+                '<html><body>a &amp; b</body></html>',
+                'a &amp; b',
+                false
+            ]
         ];
+    }
+
+    /**
+     * Test parsing of text within <body> element.
+     *
+     * @return void
+     */
+    public function testTextFromStart()
+    {
+        $html = <<<HTML
+<html>
+<body>
+a &amp;
+<div>
+    1
+    <div>b</div>
+    2
+</div>
+c
+</body>
+</html>
+HTML;
+
+        $document = Parser::load($html);
+
+        static::assertEquals(1, $document->childNodes->length);
+
+        $htmlNode = $document->childNodes->item(0);
+
+        static::assertInstanceOf('DOMElement', $htmlNode);
+        static::assertEquals('html', $htmlNode->nodeName);
+        static::assertEquals(1, $htmlNode->childNodes->length);
+        static::assertEquals(0, $htmlNode->attributes->length);
+
+        $bodyNode = $htmlNode->childNodes->item(0);
+
+        static::assertInstanceOf('DOMElement', $bodyNode);
+        static::assertEquals('body', $bodyNode->nodeName);
+        static::assertEquals(3, $bodyNode->childNodes->length);
+        static::assertEquals(0, $bodyNode->attributes->length);
+
+        $textNode1 = $bodyNode->childNodes->item(0);
+
+        static::assertInstanceOf('DOMText', $textNode1);
+        static::assertEquals(PHP_EOL . 'a &amp;' . PHP_EOL, $textNode1->textContent);
+
+        $divNode = $bodyNode->childNodes->item(1);
+
+        static::assertInstanceOf('DOMElement', $divNode);
+        static::assertEquals(3, $divNode->childNodes->length);
+        static::assertEquals(0, $divNode->attributes->length);
+
+        $innerNode = $divNode->childNodes->item(1);
+
+        static::assertInstanceOf('DOMElement', $innerNode);
+        static::assertEquals(1, $innerNode->childNodes->length);
+        static::assertEquals(0, $innerNode->attributes->length);
+        static::assertEquals('b', $innerNode->textContent);
+
+        $textNode2 = $bodyNode->childNodes->item(2);
+
+        static::assertInstanceOf('DOMText', $textNode2);
+        static::assertEquals(PHP_EOL . 'c' . PHP_EOL, $textNode2->textContent);
     }
 
     /**
