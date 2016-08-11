@@ -167,61 +167,61 @@ HTML;
         $htmlNode = $document->childNodes->item(0);
         static::assertInstanceOf('DOMElement', $htmlNode);
         static::assertEquals('html', $htmlNode->nodeName);
-        static::assertEquals(2, $htmlNode->childNodes->length - 1);
+        static::assertEquals(2, $htmlNode->childNodes->length);
         static::assertEquals(1, $htmlNode->attributes->length);
 
-        $bodyNode = $htmlNode->childNodes->item(2);
+        $bodyNode = $htmlNode->childNodes->item(1);
 
         static::assertInstanceOf('DOMElement', $bodyNode);
         static::assertEquals('body', $bodyNode->nodeName);
         static::assertEquals(0, $bodyNode->attributes->length);
 
-        $h3Node = $bodyNode->childNodes->item(1);
+        $h3Node = $bodyNode->childNodes->item(0);
 
         static::assertInstanceOf('DOMElement', $h3Node);
         static::assertEquals('h3', $h3Node->nodeName);
         static::assertEquals('Latin Extended-A', $h3Node->textContent);
 
-        $tableNode = $bodyNode->childNodes->item(5);
+        $tableNode = $bodyNode->childNodes->item(2);
 
         static::assertInstanceOf('DOMElement', $tableNode);
         static::assertEquals('table', $tableNode->nodeName);
 
-        $tableBodyNode = $tableNode->childNodes->item(3);
+        $tableBodyNode = $tableNode->childNodes->item(1);
 
         static::assertInstanceOf('DOMElement', $tableBodyNode);
         static::assertEquals('tbody', $tableBodyNode->nodeName);
 
-        $tr1Node = $tableBodyNode->childNodes->item(1);
+        $tr1Node = $tableBodyNode->childNodes->item(0);
 
         static::assertInstanceOf('DOMElement', $tr1Node);
         static::assertEquals('tr', $tr1Node->nodeName);
 
-        $td1Node = $tr1Node->childNodes->item(1);
+        $td1Node = $tr1Node->childNodes->item(0);
 
         static::assertInstanceOf('DOMElement', $td1Node);
         static::assertEquals('td', $td1Node->nodeName);
         static::assertEquals('OElig', $td1Node->nodeValue);
 
-        $td2Node = $tr1Node->childNodes->item(3);
+        $td2Node = $tr1Node->childNodes->item(1);
 
         static::assertInstanceOf('DOMElement', $td2Node);
         static::assertEquals('td', $td2Node->nodeName);
         static::assertEquals('338', $td2Node->nodeValue);
 
-        $td3Node = $tr1Node->childNodes->item(5);
+        $td3Node = $tr1Node->childNodes->item(2);
 
         static::assertInstanceOf('DOMElement', $td3Node);
         static::assertEquals('td', $td3Node->nodeName);
         static::assertEquals('"&amp;OElig;"', $td3Node->nodeValue);
 
-        $td4Node = $tr1Node->childNodes->item(7);
+        $td4Node = $tr1Node->childNodes->item(3);
 
         static::assertInstanceOf('DOMElement', $td4Node);
         static::assertEquals('td', $td4Node->nodeName);
         static::assertEquals('"&OElig;"', $td4Node->nodeValue);
 
-        $td5Node = $tr1Node->childNodes->item(9);
+        $td5Node = $tr1Node->childNodes->item(4);
 
         static::assertInstanceOf('DOMElement', $td5Node);
         static::assertEquals('td', $td5Node->nodeName);

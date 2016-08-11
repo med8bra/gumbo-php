@@ -109,8 +109,9 @@ void gumbo_recursive_parse(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* nod
             xmlAddChild(parent_node, xmlNewComment(BAD_CAST node->v.text.text));
         break;
 
-        case GUMBO_NODE_WHITESPACE:
-            xmlAddChild(parent_node, xmlNewText(BAD_CAST node->v.text.text));
+        // TODO: Whitespace option
+        // case GUMBO_NODE_WHITESPACE:
+        //    xmlAddChild(parent_node, xmlNewText(BAD_CAST node->v.text.text));
     }
 }
 

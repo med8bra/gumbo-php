@@ -241,10 +241,10 @@ HTML;
 
         static::assertInstanceOf('DOMElement', $htmlNode);
         static::assertEquals('html', $htmlNode->nodeName);
-        static::assertEquals(3, $htmlNode->childNodes->length);
+        static::assertEquals(2, $htmlNode->childNodes->length);
         static::assertEquals(1, $htmlNode->attributes->length);
 
-        $bodyNode = $htmlNode->childNodes->item(2);
+        $bodyNode = $htmlNode->childNodes->item(1);
         $aNode = $bodyNode->childNodes->item(1);
 
         static::assertInstanceOf('DOMElement', $aNode);
