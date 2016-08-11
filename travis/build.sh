@@ -54,10 +54,14 @@ fi
 
 if [ -n "${TRAVIS_REPO_SLUG}" ]; then
     echo "Travis CI detected"
+
     if [ -z "${PRODUCT}" ]; then
         PRODUCT=$(echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2)
     fi
+
     BRANCH="${TRAVIS_BRANCH}"
+    echo "Travis CI branch is <$BRANCH>"
+
     if [[ ! ${ENABLED_BRANCHES} =~ "${BRANCH}" ]] ; then
         if [ -f test.sh ]; then
             echo "Build skipped - the branch ${BRANCH} is not for packaging, found test.sh script"
