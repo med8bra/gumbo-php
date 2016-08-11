@@ -101,6 +101,73 @@ HTML;
     }
 
     /**
+     * Test parsing of text within <body> element.
+     *
+     * @dataProvider textProvider()
+     *
+     * @param string $html
+     * @param string $text
+     * @param bool   $performEqualHtml
+     *
+     * @return void
+     */
+    public function testText($html, $text, $performEqualHtml = true)
+    {
+        $document = Parser::load($html);
+
+        static::assertEquals(1, $document->childNodes->length);
+
+        if ($performEqualHtml) {
+            static::assertEquals($html . chr(10), $document->saveHTML());
+        }
+
+        $htmlNode = $document->childNodes->item(0);
+
+        static::assertInstanceOf('DOMElement', $htmlNode);
+        static::assertEquals('html', $htmlNode->nodeName);
+        static::assertEquals(1, $htmlNode->childNodes->length);
+        static::assertEquals(0, $htmlNode->attributes->length);
+
+        $bodyNode = $htmlNode->childNodes->item(0);
+
+        static::assertInstanceOf('DOMElement', $bodyNode);
+        static::assertEquals('body', $bodyNode->nodeName);
+        static::assertEquals($text, $bodyNode->textContent);
+        static::assertEquals(1, $bodyNode->childNodes->length);
+        static::assertEquals(0, $bodyNode->attributes->length);
+
+        $textNode = $bodyNode->childNodes->item(0);
+
+        static::assertInstanceOf('DOMText', $textNode);
+        static::assertEquals($text, $textNode->textContent);
+    }
+
+    /**
+     * Provides test snippets for testText().
+     *
+     * @return array
+     */
+    public function textProvider()
+    {
+        return [
+            [
+                '<html><body>a</body></html>',
+                'a'
+            ],
+            [
+                '<html><body>a > test</body></html>',
+                'a > test',
+                false
+            ],
+            [
+                '<html><body>a < test</body></html>',
+                'a < test',
+                false
+            ],
+        ];
+    }
+
+    /**
      * Test parsing of HTML with <br> element.
      *
      * @void

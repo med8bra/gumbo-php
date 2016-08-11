@@ -226,11 +226,22 @@ xmlChar* gumbo_get_text(GumboNode* node) {
        return BAD_CAST node->v.text.text;
     }
 
-    GumboStringPiece* text = &node->v.text.original_text;
+    char* real_text;
+    int length;
 
-    char* real_text = malloc(sizeof(char) * text->length + 1);
-    strncpy(real_text, text->data, text->length);
-    real_text[text->length] = '\0';
+    GumboStringPiece* text = &node->v.text.original_text;
+    GumboElement* parent_element = &node->parent->v.element;
+
+    if(parent_element->tag == GUMBO_TAG_BODY) {
+      char *ret = strstr(text->data, "</body");
+      length = ret == NULL ? text->length : ret - text->data;
+    } else {
+      length = text->length;
+    }
+
+    real_text = malloc(sizeof(char) * length + 1);
+    strncpy(real_text, text->data, length);
+    real_text[length] = '\0';
 
     return BAD_CAST real_text;
 }
