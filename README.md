@@ -45,6 +45,17 @@ This will build a 'gumbo.so' shared extension, load it in php.ini using:
 extension = gumbo.so
 ```
 
+## Known issues
+
+- double encoding of entities ([#6](https://github.com/layershifter/gumbo-php/issues/6))
+
+```php
+$doc = \Layershifter\Gumbo\Parser::load('<h1>Hello&nbsp;world!</h1>');
+var_dump($doc->saveHTML());
+
+string "<h1>Hello&amp;nbsp;world!</h1>"
+```
+
 ## Testing
 ``` bash
 $ composer install
