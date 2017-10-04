@@ -30,12 +30,22 @@ PHP_METHOD(GumboParser, load);
 // Wrappers for Gumbo.
 //
 
+typedef struct {
+	xmlDocPtr doc;
+	xmlNodePtr parent_node;
+	GumboNode* node;
+	bool forceWhitespaces;
+} gumbo_recursive_parse_args;
+
+#define gumbo_recursive_parse(...) gumbo_recursive_parse_var((gumbo_recursive_parse_args){__VA_ARGS__});
+
 xmlChar* gumbo_get_tag_name(GumboElement* element);
 xmlChar* gumbo_get_text(GumboNode* node);
 int gumbo_get_text_length(GumboNode* node, GumboStringPiece* text);
 xmlDocPtr gumbo_parse_string(zval* html);
 void gumbo_parse_element(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node);
-void gumbo_recursive_parse(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node);
+void gumbo_recursive_parse_var(gumbo_recursive_parse_args in);
+void gumbo_recursive_parse_base(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node, bool forceWhitespaces);
 void gumbo_skip_element(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node);
 
 #endif /* GUMBO_PARSER_H */

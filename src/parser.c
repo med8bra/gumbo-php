@@ -83,8 +83,16 @@ xmlDocPtr gumbo_parse_string(zval* html) {
 //
 // Recursive parser function.
 //
-void gumbo_recursive_parse(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node) {
+void gumbo_recursive_parse_var(gumbo_recursive_parse_args in) {
+    xmlDocPtr doc = in.doc;
+    xmlNodePtr parent_node = in.parent_node;
+    GumboNode* node = in.node;
+    bool forceWhitespaces = in.forceWhitespaces ? in.forceWhitespaces : false;
 
+	gumbo_recursive_parse_base(doc, parent_node, node, forceWhitespaces);
+}
+
+void gumbo_recursive_parse_base(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node, bool forceWhitespaces) {
     if(node->parse_flags & GUMBO_INSERTION_BY_PARSER) {
         gumbo_skip_element(doc, parent_node, node);
 
@@ -111,8 +119,11 @@ void gumbo_recursive_parse(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* nod
         break;
 
         // TODO: Whitespace option
-        // case GUMBO_NODE_WHITESPACE:
-        //    xmlAddChild(parent_node, xmlNewText(BAD_CAST node->v.text.text));
+        case GUMBO_NODE_WHITESPACE:
+            if(forceWhitespaces) {
+              xmlAddChild(parent_node, xmlNewText(BAD_CAST node->v.text.text));
+            }
+        break;
     }
 }
 
@@ -197,7 +208,7 @@ void gumbo_parse_element(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node)
 
     if(children.length > 0) {
         for (i = 0; i < children.length; ++i) {
-            gumbo_recursive_parse(doc, result_node, children.data[i]);
+            gumbo_recursive_parse(doc, result_node, children.data[i], element->tag == GUMBO_TAG_PRE);
         }
     }
 
