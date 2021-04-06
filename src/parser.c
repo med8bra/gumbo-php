@@ -192,7 +192,7 @@ void gumbo_parse_element(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node)
             // Manual processing of attribute name.
 
             int name_length = gumbo_attr->original_name.length;
-            char *attr_name = malloc(sizeof(char) * name_length + 1);
+            char *attr_name = emalloc(sizeof(char) * name_length + 1);
 
             strncpy(attr_name, gumbo_attr->original_name.data, name_length);
             attr_name[name_length] = '\0';
@@ -222,7 +222,7 @@ xmlChar* gumbo_get_tag_name(GumboElement* element) {
     GumboStringPiece* tag = &element->original_tag;
     gumbo_tag_from_original_text(tag);
 
-    char* tag_name = malloc(sizeof(char) * tag->length + 1);
+    char* tag_name = emalloc(sizeof(char) * tag->length + 1);
 
     strncpy(tag_name, tag->data, tag->length);
     tag_name[tag->length]= '\0';
@@ -242,7 +242,7 @@ xmlChar* gumbo_get_text(GumboNode* node) {
     int length = gumbo_get_text_length(node, text);
     char* real_text;
 
-    real_text = malloc(sizeof(char) * length + 1);
+    real_text = emalloc(sizeof(char) * length + 1);
     strncpy(real_text, text->data, length);
     real_text[length] = '\0';
 
