@@ -40,7 +40,7 @@ typedef struct {
 #define gumbo_recursive_parse(...) gumbo_recursive_parse_var((gumbo_recursive_parse_args){__VA_ARGS__});
 
 xmlChar* gumbo_get_tag_name(GumboElement* element);
-xmlChar* gumbo_get_text(GumboNode* node);
+xmlNodePtr gumbo_get_text(GumboNode* node);
 int gumbo_get_text_length(GumboNode* node, GumboStringPiece* text);
 xmlDocPtr gumbo_parse_string(zval* html);
 void gumbo_parse_element(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node);

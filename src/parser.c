@@ -111,7 +111,7 @@ void gumbo_recursive_parse_base(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode
 
         case GUMBO_NODE_CDATA:
         case GUMBO_NODE_TEXT:
-            xmlAddChild(parent_node, xmlNewText(gumbo_get_text(node)));
+            xmlAddChild(parent_node, gumbo_get_text(node));
         break;
 
         case GUMBO_NODE_COMMENT:
@@ -164,8 +164,7 @@ void gumbo_parse_element(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node)
     int i;
 
     // Creating XML node.
-
-    xmlNodePtr result_node = xmlNewNode(NULL, gumbo_get_tag_name(element));
+    xmlNodePtr result_node = xmlNewNodeEatName(NULL, gumbo_get_tag_name(element));
 
     // Processing namespaces.
 
@@ -189,16 +188,9 @@ void gumbo_parse_element(xmlDocPtr doc, xmlNodePtr parent_node, GumboNode* node)
         for (i = 0; i < attributes.length; ++i) {
             GumboAttribute* gumbo_attr = attributes.data[i];
 
-            // Manual processing of attribute name.
-
-            int name_length = gumbo_attr->original_name.length;
-            char *attr_name = emalloc(sizeof(char) * name_length + 1);
-
-            strncpy(attr_name, gumbo_attr->original_name.data, name_length);
-            attr_name[name_length] = '\0';
-
-            xmlNewProp(result_node, BAD_CAST attr_name, BAD_CAST gumbo_attr->value);
-            free(attr_name);
+            xmlChar* attr_name = xmlCharStrndup(gumbo_attr->original_name.data,gumbo_attr->original_name.length);
+            xmlNewProp(result_node, attr_name, BAD_CAST gumbo_attr->value);
+            xmlFree(attr_name);
         }
     }
 
@@ -222,31 +214,20 @@ xmlChar* gumbo_get_tag_name(GumboElement* element) {
     GumboStringPiece* tag = &element->original_tag;
     gumbo_tag_from_original_text(tag);
 
-    char* tag_name = emalloc(sizeof(char) * tag->length + 1);
-
-    strncpy(tag_name, tag->data, tag->length);
-    tag_name[tag->length]= '\0';
-
-    return BAD_CAST tag_name;
+    return xmlCharStrndup(tag->data,tag->length);
 }
 
 //
 // Function that returns pointer to real text.
 //
-xmlChar* gumbo_get_text(GumboNode* node) {
+xmlNodePtr gumbo_get_text(GumboNode* node) {
     if (node->v.text.text[0] == '\0') {
-       return BAD_CAST node->v.text.text;
+       return xmlNewTextLen(BAD_CAST node->v.text.text,0);
     }
 
     GumboStringPiece* text = &node->v.text.original_text;
-    int length = gumbo_get_text_length(node, text);
-    char* real_text;
-
-    real_text = emalloc(sizeof(char) * length + 1);
-    strncpy(real_text, text->data, length);
-    real_text[length] = '\0';
-
-    return BAD_CAST real_text;
+    const int length = gumbo_get_text_length(node, text);
+    return xmlNewTextLen(BAD_CAST text->data,length);
 }
 
 int gumbo_get_text_length(GumboNode* node, GumboStringPiece* text) {
